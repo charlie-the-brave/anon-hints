@@ -1,0 +1,74 @@
+#
+# Overview
+#
+
+This project implements HINTs RL framework. To ensure fast and stable setup, we highly recommend running in a docker container. We've provided a Dockerfile that will setup an environment that satisfies dependencies including: cuda, hydra, mujoco-py, gym, etc. There are also tight restrictions on certain python package versions (e.g., numpy).
+
+TODO: bugfix in discrete environments
+
+#
+# DOCKER setup
+#
+
+# 1) first, update baseimage in Dockerfile to ensure compatibility with your gpu
+nano Dockerfile
+# 2) build image
+docker build --no-cache -t hints:latest ./
+# 3) create container
+docker create -it --name train hints:latest
+# 4) run container (on GPU)
+docker run --rm --runtime=nvidia -it --gpus all USER/hints:latest
+# note: if this step fails, there is likely a compatibility issue with 
+#       the base image. Verify that the base image uses the same CUDA 
+#       version as your target machine (run nvcc --version or nvidia-smi).
+# 5) edit config - adjust hydra parameters (e.g., for GPU memory constraints)
+# https://hydra.cc/docs/plugins/submitit_launcher/#usage 
+root@aaa:/hints# vim config/config.yaml
+# 6) quick test ('-m' indicates multi-run; e.g., sweep)
+`python3 train.py -m envs=pendulum,double,acrobot,cartpole,ant,cheetah,humanoid run_name=anon-hints-v0 state_type=observation policy_type=default horizon=1024 max_trials=1 z_info=none horizon=10 num_steps=10`
+
+`python3 train.py -m envs=pendulum,double,acrobot,cartpole,ant,cheetah,humanoid run_name=anon-hints-v0 state_type=observation policy_type=conditional horizon=1024 max_trials=1 z_info=state horizon=10 num_steps=10`
+
+---
+
+#
+# Run
+#
+
+# generator training (outputs to 'results')
+`python3 agent/hint_generator.py envs=pendulum z_info=angle z_source=predicted-resnet policy_type=random &`
+
+# plotting
+`python3 plot_predicted.py --results_dir=results --trials=1  --run_name=predicted-resnet_angle`
+  
+# agent training (saves to 'res'; shows annotated *raw* policy inputs)
+`python3 train.py envs=pendulum num_steps=10 run_name=test-run policy_type=default &`
+`python3 train.py -m envs=pendulum num_steps=10 run_name=test-hints z_info=none,height,angle,height-angle &`
+  
+# agent evaluation (saves to 'eval_<run_name>'; shows annotated *enlargened* policy inputs)
+`python3 evaluate.py run_name=test-run1 checkpoint_path=${pwd}/res/test-run`
+
+# (optional) copy results from container
+docker cp <container_name>:<container_results_dir> <local_results_diri>
+
+# plotting  (use single_run for results generated without '-m')
+python3 plot.py --run_name test-run --trials 5 --single_run
+python3 plot.py --run_name test-hints --trials 5 
+python3 plot.py --run_name test-run1,test-run2,test-runk --trials 50 --eval_only
+
+---
+  
+#
+# Experiments
+#
+
+Note: use envs=env_config.yaml to load correct parameters instead of commandline overrides.
+
+Running single experiment
+`python3 train.py envs=cartpole num_steps=10 &`
+
+Running sweep
+`python3 train.py -m envs=cartpole,pendulum,ant num_steps=100 lr= &`
+  
+# baseline evaluation (DaGGER, GAIL, DRQ)
+(instructions pending)

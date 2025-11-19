@@ -1,0 +1,58 @@
+# tested with hydra-core==1.1.0, hydra-submitit-launcher==1.2.0
+# evaluate.py envs=cartpole,pendulum
+
+defaults:
+  - _self_
+  - envs@_global_: default
+  - override hydra/launcher: submitit_local
+
+run_name: ${now:%Y-%m-%d}_${now:%H%M%S}
+n_cpus: 8 # parallel processing
+device: cuda
+
+ # (*absolute path*) pointer to potentially multiple checkpoints for evaluation
+checkpoint_path: ${PWD}/res/${run_name}/${env_name}
+generator_checkpoint_path: NULL
+# outputs
+agent_model: net_best.pth # net_best.pth or net_final.pth
+out_dir: envs # later, create subdir with same name as checkpoint dir
+
+# env paramters
+seed: 4242424242
+horizon: 200 
+state_type: observation # observation or vector
+action_type: continuous # continuous or discrete
+action_repeat: 2
+should_modify_env: false
+no_render: true
+input_noise_level: 0
+
+ # do not change below!
+test_interval: 1
+agent_type: test
+policy_type: default
+z_info: none
+z_source: none
+z_method: none
+z_type: NULL # (do not specify) internal type
+generator:
+  cxt_size: 5 # context window size
+start_trial: 0
+max_trials: 50
+use_normalised_rewards: true
+use_normalised_actions: false
+
+hydra:
+  run:
+    dir: ./res/eval_${run_name}_${hydra.job.override_dirname}
+  job:
+    config:
+      override_dirname:
+        exclude_keys:
+          - envs 
+          - run_name
+          - checkpoint_path 
+          - agent_model
+          - z_info
+          - agent_type
+          - policy_type

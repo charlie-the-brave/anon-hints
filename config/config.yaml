@@ -1,0 +1,99 @@
+# tested with hydra-core==1.1.0, hydra-submitit-launcher==1.2.0
+# (!) NOTE: use lowercase values
+# example: 
+# train.py envs=cartpole,pendulum state_type=observation policy_type=default
+
+defaults:
+  - _self_
+  - envs@_global_: default
+  - override hydra/launcher: submitit_local
+
+env_name: CartPole-v0 # required commandline argument
+run_name: ${now:%Y-%m-%d}_${now:%H%M%S}
+
+# inputs
+checkpoint_path: NULL # absolute path to checkpoint to load
+generator_checkpoint_path: NULL # absolute path to pre-trained generator
+load_epoch: 0 # epoch to load from checkpoint
+
+# outputs
+agent_model: net_final.pth # net_best.pth or net_final.pth
+out_dir: ${z_source}_${z_info}
+
+# env paramters (use lowercase values)
+seed: 0 
+horizon: 1 # set to 1024
+state_type: observation # observation or vector
+action_type: continuous # continuous or discrete
+action_repeat: 2
+should_modify_env: false
+input_noise_level: 0
+
+# agent/model parameters (use lowercase values)
+agent_type: ppo # backbone ppo or drq
+policy_type: default # default or conditional
+z_info: none # depends on environment
+z_source: ground_truth # ground_truth or predicted-resnet
+z_method: fc # conditioning methods: lc - latent, ac - additive, fc - film, mc - masked
+z_type: NULL # (do not specify) internal type
+generator:
+  pct_split: 0.8
+  lr: 1e-3 # learning rate
+  wd: 1e-4 # weight decay
+  mt: 0.9  # momentum
+  batch_size: 128
+  cxt_size: 5 # context window size
+  should_finetune: false 
+
+# algo parameters (use lowercase values)
+should_free_memory: true # free memory after each trial
+max_trials: 5
+num_steps: 1000
+test_interval: 50
+save_interval: 1000
+collect_interval: 1
+batch_size: 1024
+use_normalised_rewards: true
+use_normalised_actions: false
+gamma: 0.99
+gae_lambda: 0.95
+value_coef: 0.5
+entropy_coef: 0.01
+epochs_per_step: 30
+lr: 1e-3
+lr_a: 3e-4
+lr_c: 1e-3
+clip: 0.1
+discount: 0.99
+device: cuda
+start_trial: 0
+task_delay_s: 3
+
+hydra:
+  run:
+    dir: ./res/${run_name}_${hydra.job.override_dirname}
+  sweep:
+    dir: ./res/${run_name}/${env_name}
+    subdir: ${hydra.job.override_dirname}
+  launcher:
+    timeout_min: 4300
+    cpus_per_task: 4
+    gpus_per_node: 2  # set to `nvidia-smi --list-gpus | wc -l`
+    tasks_per_node: 2 # set to 1 to avoid potench OOM on irg-gpu T.T only 10G
+    #max_num_tasks: 4  # limit number of concurrent tasks
+    mem_gb: 32
+    nodes: 1
+    submitit_folder: ./res/${run_name}/${env_name}/.slurm
+  job:
+    config:
+      override_dirname:
+        exclude_keys:
+          - envs 
+          - run_name
+          - num_steps 
+          - z_info
+          - z_source
+          - agent_type
+          - policy_type
+          - max_trials
+          - horizon

@@ -1,0 +1,17 @@
+defaults:
+  - _self_
+
+env_name: HalfCheetah-v4
+
+# env paramters
+horizon: 1024 # length of rollouts during experience collection 
+action_type: continuous # continuous or discrete
+
+# algo parameters
+num_steps: 1000
+save_interval: 1000
+
+# algo parameters
+lr: 1e-3
+lr_a: 3e-4
+lr_c: 1e-3
