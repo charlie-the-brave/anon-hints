@@ -37,7 +37,6 @@ class CartPendulumEnv(ControlEnv):
         obs = super().reset(**kwargs)
         self.steps_above_height = 0
         self.th_initial = self.data.qpos[2]
-        self.frame_initial = self.draw_cues(z_type='none', cues=self.compute_cues())
         return obs
 
     def _step(self, action):
@@ -79,7 +78,7 @@ class CartPendulumEnv(ControlEnv):
         if frame is None:
             frame = self.get_observation() * 255
 
-        W, H = frame.shape[0:2]
+        H, W = frame.shape[0:2]
         l_to_pel = H // 4
 
 
@@ -140,10 +139,12 @@ class CartPendulumEnv(ControlEnv):
         elif 'angle' in z_type:
             z_in_size = 2  # angular velocity at each joint (second relative to first)
         elif 'state' in z_type:
-            self.state_cues = True
             z_in_size = self.get_state().shape[0]
         else:
             raise ValueError(f'invalid z_type - {z_type}')
+
+        if 'state' in z_type:
+            self.state_cues = True
 
         return dict(z_type=z_type,
                     observation_space=self.observation_space,

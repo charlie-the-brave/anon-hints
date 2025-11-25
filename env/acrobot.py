@@ -69,7 +69,7 @@ class AcrobotEnv(ControlEnv):
         if self.state_cues:
             return frame
 
-        W, H = frame.shape[0:2]
+        H, W = frame.shape[0:2]
         l_to_pel = H // 4
         h_center = H // 2
 
@@ -123,10 +123,12 @@ class AcrobotEnv(ControlEnv):
         elif 'angle' in z_type:
             z_in_size = 2  # angular velocity at each joint
         elif 'state' in z_type:
-            self.state_cues = True
             z_in_size = self.get_state().shape[0]
         else:
             raise ValueError(f'invalid z_type - {z_type}')
+
+        if 'state' in z_type:
+            self.state_cues = True
 
         return dict(z_type=z_type,
                     observation_space=self.observation_space,

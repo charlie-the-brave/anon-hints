@@ -54,7 +54,6 @@ class CheetahEnv(ControlEnv):
         self.distance_travelled = 0.
         self.goal_distance = 50 
         self.inital_com = self.get_body_com("torso").copy()
-        self.frame_initial = self.draw_cues(z_type='none', cues=self.compute_cues())
         return obs
 
     def _step(self, action):
@@ -91,8 +90,8 @@ class CheetahEnv(ControlEnv):
         if self.state_cues:
             return frame
 
-        W, H = frame.shape[0:2]
-        W, H = W - W // 8, H // 8 # offset things (note that vertical axis is flipped)
+        H, W = frame.shape[0:2]
+        W, H = W - W // 8, H // 8 # box corner offset
 
         speed_norm = self.safe_ratio(cues[1], self.goal_speed)
         pct_distance = self.safe_ratio(cues[4], self.goal_distance) if len(cues) > 4 else 0

@@ -45,7 +45,7 @@ def make_policy(cfg, env_args):
       update_and_save_config(cfg, "checkpoint_path", ['generator_checkpoint_path', 'policy_type', 'agent_type', 'state_type', 'action_type', 'env_name'])
 
     if cfg['policy_type'] == 'default': # however, conditional can have z_info none (e.g., sweeps)
-        assert cfg['z_info'] == 'none', "default policy cannot have z_type"
+        assert cfg['z_info'] == 'none', f"default policy cannot have z_info {cfg['z_info']}"
 
     if cfg['policy_type'] == 'default' or cfg['z_info'] == 'none':
         return PolicyNet(env_args, cfg['state_type'], cfg['action_type'], dv, -1)

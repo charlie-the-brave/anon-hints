@@ -54,7 +54,6 @@ class CartEnv(ControlEnv):
         self.steps_above_height = 0
         self.timer = 0
         self.th_initial = self.state[0]
-        self.frame_initial = self.draw_cues(z_type='none', cues=None)
         return obs
 
     def _step(self, action):
@@ -133,7 +132,7 @@ class CartEnv(ControlEnv):
         if self.state_cues:
             return frame
 
-        W, H = frame.shape[0:2]
+        H, W = frame.shape[0:2]
         l_to_pel = H // 4
 
         if z_type == 'none':
@@ -146,9 +145,9 @@ class CartEnv(ControlEnv):
             c = (255 - dth, 0, dth)
 
         T = H // 64
-        offs = 0#int(2 * T) #int(0.03 * W if T < 2 else 2 * T)
+        offs = int(0.08 * W if T < 2 else 0.03 * W)
         h_from_top = int(cues[0] * l_to_pel)
-        h_top = int(1.0 * l_to_pel + int(l_to_pel * (-1 * self.target_height + 1)))
+        h_top = int(1.5 * l_to_pel + int(l_to_pel * (-1 * self.target_height + 1)))
         cv.arrowedLine(frame, (W - offs, h_top), (W - offs, h_top + h_from_top), c, thickness=T)
 
         if annotate:

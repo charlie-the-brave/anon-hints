@@ -4,7 +4,15 @@
 
 This project implements HINTs RL framework. To ensure fast and stable setup, we highly recommend running in a docker container. We've provided a Dockerfile that will setup an environment that satisfies dependencies including: cuda, hydra, mujoco-py, gym, etc. There are also tight restrictions on certain python package versions (e.g., numpy).
 
-TODO: bugfix in discrete environments
+NOTE: we found and fixed a bug in training state-conditioned policies. The last
+columns in Tables 2 & 3 should have the name '\{h\}' to denote a set of all the
+cues to the left of 'composite' column. For example, in Pendulum-v1, the set
+contains goal distance, angular velocity, and action-based cue. '\{h\}' has more
+information than the cues in preceeding columns.
+
+Specifically, the bug involved swapping state for '\{h\}' during data collection
+as part of a temporary function in the legacy code. Removing this function
+while refactoring revealed the bug.
 
 #
 # DOCKER setup

@@ -106,7 +106,7 @@ class PendulumEnv(ControlEnv):
         if self.state_cues:
             return frame
 
-        W, H = frame.shape[0:2]
+        H, W = frame.shape[0:2]
         l_to_pel = H // 4
         L, V_MAX = W // 6, 8 
 
@@ -171,10 +171,8 @@ class PendulumEnv(ControlEnv):
         elif 'test' in z_type:
             z_in_size = len(self.compute_cues())
         elif 'state-partial' in z_type:
-            self.state_cues = True
             z_in_size = len(self.get_state()[:2])  # x, y
         elif 'state' in z_type:
-            self.state_cues = True
             z_in_size = len(self.get_state())  # x, y, ang_vel
         elif 'height-angle' in z_type:
             z_in_size = 2
@@ -182,6 +180,9 @@ class PendulumEnv(ControlEnv):
             z_in_size = 1  # height or angle
         else:
             raise ValueError(f'invalid z_type - {z_type}')
+
+        if 'state' in z_type:
+            self.state_cues = True
 
         return dict(z_type=z_type,
                     observation_space=self.observation_space,

@@ -37,7 +37,6 @@ class AntEnv(ControlEnv):
         xy = self.get_body_com("torso")[:2].copy()
         self.state_info = dict(x_position=xy[0], y_position=xy[1], x_velocity=0, y_velocity=0, distance_from_origin=0)
         self.goal_distance = 50#50 * np.random.uniform(0, 1)
-        self.frame_initial = self.draw_cues(z_type='none', cues=self.compute_cues())
         return obs
 
     def _step(self, action):
@@ -68,8 +67,8 @@ class AntEnv(ControlEnv):
         if self.state_cues:
             return frame
 
-        W, H = frame.shape[0:2]
-        W, H = W - W // 8, H // 8 # offset things (note that vertical axis is flipped)
+        H, W = frame.shape[0:2]
+        W, H = W - W // 8, H // 8 # box corner offset
 
         z_dist_norm = cues[2]
         speed_norm = self.safe_ratio(cues[1], 10)
