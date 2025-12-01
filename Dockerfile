@@ -27,6 +27,7 @@ RUN apt-get update -q \
     libosmesa6-dev \
     software-properties-common \
     net-tools \
+    swig \
     tree \
     vim \
     virtualenv \
@@ -54,7 +55,7 @@ RUN pip install --upgrade pip
 RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
 RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
 RUN conda install -c conda-forge libstdcxx-ng=12
-RUN conda install python=3.10
+RUN conda install python=3.10.13
 
 RUN mkdir -p /root/.mujoco \
     && wget https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz -O mujoco.tar.gz \
@@ -88,7 +89,8 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt
 # (!) TODO: update the following url, updating the cuda version to match that of the native machine
 # RUN python3 -m pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cu121 # lincoln hpc
 RUN python3 -m pip install torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0 --index-url https://download.pytorch.org/whl/cu128 # home gpu
-RUN python3 -m pip install -U gym[classic_control,mujoco,atari]
+# box2d requries swig (do not install via pip!)
+RUN python3 -m pip install -U gym[classic_control,mujoco,atari,box2d]
 RUN python3 -m pip install -U 'mujoco-py<2.2,>=2.1'
 RUN python3 -m pip install git+https://github.com/aravindr93/mjrl.git 
 # Install custom sb3 for compatibility with gym 0.24+

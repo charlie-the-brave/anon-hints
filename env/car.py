@@ -65,14 +65,11 @@ class CarEnv(ControlEnv):
         return self._resize(ret)
 
     def _step(self, action):
+        """ overrides wrappera to return downsized image """
+        self.t += 1
+        action = self.to_action_space(action)
         ret = super().step(action)
         return self._resize(ret[0]), *ret[1:]
-
-    def to_action_space(self, action: np.ndarray):
-        """ input in [-1, 1]^3 """
-        # when generating exemplars, if this preproc changes (e.g., scale/shift)
-        action = np.clip(action, self.env.action_space.low, self.env.action_space.high)
-        return action.astype('float')
 
     def draw_cues(self, z_type, cues, frame=None, annotate=True):
         """ illustrates cues on image frame, purely for inspection, not policy input! """
