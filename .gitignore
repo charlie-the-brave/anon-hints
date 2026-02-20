@@ -1,12 +1,10 @@
 baseline/
 **/__pycache__/
-exp/
 res/
-ignore/
-tmp/
+results
 debug/
 config/toml/
-hgen.egg-info/
+hints.egg-info/
 .idea/
 .vscode/
 
