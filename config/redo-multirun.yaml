@@ -1,0 +1,67 @@
+defaults:
+  - _self_
+  - envs@_global_: cartpole
+  - override hydra/launcher: submitit_local
+
+env_name: dummy # required commandline argument
+worker_path: ??? 
+
+# inputs
+checkpoint_path: ${out_dir} #${worker_path}/${out_dir}
+load_epoch: 0 # epoch to load from checkpoint
+
+# outputs
+agent_model: net_final.pth # net_best.pth or net_final.pth
+out_dir: ${policy_type}_${z_method}_${z_info}
+
+# env paramters
+seed: 1
+horizon: 1 # set to 1024
+state_type: observation # observation or vector
+action_type: continuous # continuous or discrete
+action_repeat: 2
+should_modify_env: false
+input_noise_level: 0
+
+# agent/model parameters
+agent_type: ppo # backbone ppo or drq
+policy_type: default # default or conditional
+z_info: none # depends on environment
+z_source: ground_truth # ground_truth or predicted
+z_method: fc # conditioning methods: lc - latent, ac - additive, fc - film, mc - masked
+
+# algo parameters
+max_trials: 5
+num_steps: 1000
+save_interval: 1000
+test_interval: 50
+collect_interval: 1
+batch_size: 1024
+use_normalised_rewards: true
+use_normalised_actions: false
+gamma: 0.99
+gae_lambda: 0.95
+value_coef: 0.5
+entropy_coef: 0.01
+epochs_per_step: 30
+lr: 1e-3
+lr_a: 3e-4
+lr_c: 1e-3
+clip: 0.1
+discount: 0.99
+device: cuda
+start_trial: 0
+
+hydra:
+  run:
+    dir: ${worker_path}
+  sweep:
+    dir: ./redo-multirun_${env_name}
+  launcher:
+    timeout_min: 4300
+    cpus_per_task: 4
+    gpus_per_node: 2
+    tasks_per_node: 1
+    mem_gb: 160
+    nodes: 1
+    submitit_folder: ./res/${run_name}/${env_name}/.slurm
