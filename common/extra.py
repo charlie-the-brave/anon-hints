@@ -62,11 +62,10 @@ class MetricLogger:
       self.eval.metrics[k] = np.mean(v, axis=0)
 
   def log(self, key, value, is_train):
-    if not f"train/{key}" in self.train.metrics.keys() or not f"eval/{key}" in self.train.metrics.keys():
-      pass # some metric types contain partial set of logged keys (e.g., generator loss)
-    elif is_train:
+    # some metric types contain partial set of logged keys (e.g., generator loss)
+    if is_train and f"train/{key}" in self.train.metrics.keys():
       self.train.metrics[f"train/{key}"].append(value)
-    else:
+    elif not is_train and f"eval/{key}" in self.eval.metrics.keys():
       self.eval.metrics[f"eval/{key}"].append(value)
 
   def dump(self, outdir, id):
