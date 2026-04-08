@@ -1,3 +1,15 @@
+# Requested experiments
+
+## Noise ablation
+
+Gaussian perturbation (bottom) and constant noise (top) offsets are applied to the cue before conditioning a policy in the pendulum environment.
+![reviews/pendulum-noise-ablation.png](https://github.com/charlie-the-brave/anon-hints/blob/reviews/pendulum-noise-ablation.png?raw=true)
+
+Learning curves of policies with the respective noised cues. In most cases, the performance is maintained.
+![reviews/pendulum-noise-ablation-result.png](https://github.com/charlie-the-brave/anon-hints/blob/reviews/pendulum-noise-ablation-result.png?raw=true)
+
+
+
 
 # HINTs RL Framework
 
