@@ -1,22 +1,3 @@
-# Requested experiments
-
-## Noise ablation
-
-Gaussian perturbation (bottom) and constant noise (top) offsets are applied to the cue before conditioning a policy in the pendulum environment.
-![reviews/pendulum-noise-ablation.png](https://github.com/charlie-the-brave/anon-hints/blob/reviews/pendulum-noise-ablation.png?raw=true)
-
-Learning curves of policies with the respective noised cues. In most cases, the performance is maintained.
-![reviews/pendulum-noise-ablation-result.png](https://github.com/charlie-the-brave/anon-hints/blob/reviews/pendulum-noise-ablation-result.png?raw=true)
-
-# Cross-domain
-
-Training G in multi-task fashion. The learnt generator undergoes training (Appendix B.1) in both Pendulum and Acrobot environments. Shown are the prediction offsets during training.
-![reviews/multi-task-pendulum-acrobot.png](https://github.com/charlie-the-brave/anon-hints/blob/reviews/multi-task-pendulum-acrobot.png?raw=true)
-
-G is then deployed to Pendulum, Acrobot, and Inverted Double Pendulum (IDP) for training a policy (Algorithm 1). Note that IDP is unseen. Agents conditioned on multi-task G (`HINTS-FC-multi-task`) do just as well or better than agents conditioned on environment-specific G (`HINTS-FC*`). In IDP, `HINTS-FC-multi-task` outperforms learning from image observations alone. A more powerful parameterisation of G would likely help to close the gap to `HINTS-FC*`.
-![reviews/multi-task-pendulum-acrobot-result.png](https://github.com/charlie-the-brave/anon-hints/blob/reviews/multi-task-pendulum-acrobot-result.png?raw=true)
-
-
 # HINTs RL Framework
 
 [![Docker](https://img.shields.io/badge/Docker-Setup-blue?logo=docker)](https://hub.docker.com)
